@@ -88,7 +88,7 @@
 
 ;;;; 1.3.2 CONSTRUCTING PROCEDURES USING LAMBDA
 
-;; lambda is used to create procedures in the same way as define, except that no name is specified for
+;; LAMBDA is used to create procedures in the same way as define, except that no name is specified for
 ;; the procedure:
 ;; (lambda (<formal-parameters>) <body>)
 
@@ -133,7 +133,7 @@
        (* y b)
        (* a b))))
 
-;; general form of a let expression:
+;; general form of a LET expression:
 ;; (let ((<var1> <exp1)
 ;;       (<var2> <exp2)
 ;;       ...
@@ -186,3 +186,38 @@
    3 (+ x 2)))
 
 (= (test-let2 2) (test-lambda2 2))
+
+;;;; 1.3.3 PROCEDURES AS GENERAL METHODS
+
+;; mechanisms of abstraction so far:
+;; - compound procedures (abstracting patterns of numerical operations so as to make them
+;;   independent of the particular numbers involved)
+;; - higher-order procedures (procedures used to express general methods of computation, independent
+;;   of the particular functions involved)
+
+;; finding roots of equations by the half-interval method
+
+;; THE HALF-INTERVAL METHOD
+;; a simple but powerful technique for finding roots of an equation f(x) = 0, where f is a continuous
+;; function. given a and b such that f(a) < 0 < f(b), then f must have at least one zero between a
+;; and b. to locate a zero, let x be the average of a and b, and compute f(x). if f(x) > 0, then f
+;; must have a zero between a and x. if f(x) < 0, then f must have a zero between x and b.
+
+(define (average x y) (/ (+ x y) 2))
+
+(define (close-enough? x y)
+  (let ((epsilon 0.001))
+    (< (abs (- x y)) epsilon)))
+
+(define (search f neg-point pos-point)
+  (let ((midpoint
+          (average neg-point pos-point)))
+    (if (close-enough? neg-point pos-point)
+      midpoint
+      (let ((test-value (f midpoint)))
+        (cond
+          ((positive? test-value)
+           (search f neg-point midpoint))
+          ((negative? test-value)
+           (search f midpoint pos-point))
+          (else midpoint))))))
